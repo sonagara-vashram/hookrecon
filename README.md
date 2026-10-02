@@ -1,6 +1,6 @@
 # hookrecon — find Stripe payments that never reached your database
 
-<!-- LAUNCH TODO — demo GIF (see instructions below, then delete this comment):
+<!--
 <p align="center">
   <img src="docs/hookrecon.gif"
        alt="hookrecon finding Stripe payments that never reached the database — webhook failed, order missing"
@@ -12,10 +12,8 @@
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-<!-- LAUNCH TODO: pehli PyPI publish ke baad (tag v0.9.2 push → release.yml auto-publish) is
-     comment ko hata do — tab tak shields.io "package or version not found" (red) dikhata hai:
 [![PyPI](https://img.shields.io/pypi/v/hookrecon)](https://pypi.org/project/hookrecon/)
--->
+
 
 **hookrecon is a read-only CLI that reconciles Stripe against your Postgres database.** It lists every completed payment whose webhook never made it into your app — with the amount, the customer's object id, and a deep link to the event in your Stripe dashboard. Zero install, zero signup, zero telemetry.
 
