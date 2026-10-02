@@ -22,11 +22,15 @@ jobs:
       - run: python -m unittest discover tests -v
       - name: Exit-code smoke (no Stripe/DB needed)
         shell: bash
+        # GitHub's bash runs with -e -o pipefail: a bare `cmd; rc=$?` dies on the
+        # expected non-zero exit, so every probe must use the `|| rc=$?` pattern.
         run: |
           cd "$(mktemp -d)"
-          hookrecon check >/dev/null 2>&1; rc=$?
+          rc=0
+          hookrecon check >/dev/null 2>&1 || rc=$?
           [ "$rc" -eq 2 ] || { echo "missing config: expected exit 2, got $rc"; exit 1; }
           echo '{not json' > hookrecon.config.json
-          hookrecon check >/dev/null 2>&1; rc=$?
+          rc=0
+          hookrecon check >/dev/null 2>&1 || rc=$?
           [ "$rc" -eq 2 ] || { echo "malformed config: expected exit 2, got $rc"; exit 1; }
           echo "exit-code smoke ok"
