@@ -15,8 +15,8 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/Vasram/hookrecon"
-Issues = "https://github.com/Vasram/hookrecon/issues"
+Repository = "https://github.com/sonagara-vashram/hookrecon"
+Issues = "https://github.com/sonagara-vashram/hookrecon/issues"
 
 [project.scripts]
 hookrecon = "hookrecon.cli:main"

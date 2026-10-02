@@ -1,12 +1,12 @@
 # hookrecon — find Stripe payments that never reached your database
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Vasram/hookrecon/main/docs/hookrecon.gif"
+  <img src="https://raw.githubusercontent.com/sonagara-vashram/hookrecon/main/docs/hookrecon.gif"
        alt="hookrecon finding Stripe payments that never reached the database — webhook failed, order missing"
        width="720">
 </p>
 
-[![CI](https://github.com/Vasram/hookrecon/actions/workflows/ci.yml/badge.svg)](https://github.com/Vasram/hookrecon/actions/workflows/ci.yml)
+[![CI](https://github.com/sonagara-vashram/hookrecon/actions/workflows/ci.yml/badge.svg)](https://github.com/sonagara-vashram/hookrecon/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -306,7 +306,7 @@ v1 is deliberately small. What gets built next is decided by demand, not specula
 ## Contributing & development
 
 ```bash
-git clone https://github.com/Vasram/hookrecon && cd hookrecon
+git clone https://github.com/sonagara-vashram/hookrecon && cd hookrecon
 python -m pip install -e .
 python -m unittest discover tests
 ```
