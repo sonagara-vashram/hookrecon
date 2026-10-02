@@ -1,4 +1,4 @@
-"""SQL lint + $n → %s translation — the trust boundary (PLAN §3 config.py)."""
+"""SQL lint + $n → %(param)s translation — the trust boundary (PLAN §3 config.py)."""
 
 import unittest
 
@@ -40,11 +40,24 @@ class TranslatePlaceholdersTest(unittest.TestCase):
     def test_single_placeholder(self):
         self.assertEqual(
             translate_placeholders("SELECT 1 FROM t WHERE id = $1"),
-            "SELECT 1 FROM t WHERE id = %s",
+            "SELECT 1 FROM t WHERE id = %(param)s",
         )
 
     def test_two_placeholders(self):
-        self.assertEqual(translate_placeholders("SELECT $1 + $2"), "SELECT %s + %s")
+        self.assertEqual(translate_placeholders("SELECT $1 + $2"), "SELECT %(param)s + %(param)s")
+
+    def test_repeated_dollar_one_passes_and_binds_one_value(self):
+        sql = "SELECT 1 FROM t WHERE a = $1 OR b = $1"
+        self.assertEqual(
+            translate_placeholders(lint_select(sql)),
+            "SELECT 1 FROM t WHERE a = %(param)s OR b = %(param)s",
+        )
+
+    def test_higher_placeholders_rejected_loudly(self):
+        # binding one value into $2 would be silently wrong — reject at lint time
+        with self.assertRaises(ConfigError) as ctx:
+            lint_select("SELECT 1 FROM t WHERE a = $1 AND b = $2")
+        self.assertIn("only $1 is supported", str(ctx.exception))
 
 
 if __name__ == "__main__":

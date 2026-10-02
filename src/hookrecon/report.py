@@ -38,7 +38,12 @@ def format_amount(minor_units: int, currency: str | None) -> str:
     if code and code.upper() in _ZERO_DECIMAL:
         text = str(minor_units)  # never divided — zero-decimal currencies
     else:
-        text = f"{minor_units // 100}.{minor_units % 100:02d}"  # exact integer math
+        # abs() avoids Python's floor-division gotcha on negatives:
+        # -150 // 100 = -2 and -150 % 100 = 50, which would render "-2.50"
+        # instead of the correct "-1.50".
+        sign = "-" if minor_units < 0 else ""
+        pos = abs(minor_units)
+        text = f"{sign}{pos // 100}.{pos % 100:02d}"
     symbol = _SYMBOLS.get(code)
     if symbol:
         return f"{symbol}{text}"
@@ -112,7 +117,7 @@ def _check_lines(check: dict, color: bool) -> list[str]:
         format_amount(d["amount"], d["currency"]) if d["amount"] is not None else "-"
         for d in check["drifts"]
     ]
-    id_width = max(len(d["objectId"]) for d in check["drifts"])
+    id_width = max(len(str(d["objectId"] or "")) for d in check["drifts"])
     amount_width = max(map(len, amounts))
     lines = [head]
     for drift, amount in zip(check["drifts"], amounts):
@@ -121,7 +126,7 @@ def _check_lines(check: dict, color: bool) -> list[str]:
         )
         date = _fmt_date(created) if created else "?"
         lines.append(
-            f"      {_c(BOLD, drift['objectId'].ljust(id_width), color)}"
+            f"      {_c(BOLD, str(drift['objectId'] or '').ljust(id_width), color)}"
             f"  {_c(BOLD, amount.rjust(amount_width), color)}"
             f"  {_c(DIM, date, color)}"
         )
@@ -136,10 +141,10 @@ def _check_lines(check: dict, color: bool) -> list[str]:
     return lines
 
 
-def _short(event_id: str) -> str:
+def _short(event_id: str | None) -> str:
     """evt_3ULnzKDtbOMvzOcU1LSvAY46 → evt_3ULnzKDtbO…LSvAY46 — full id lives in the URL/JSON."""
-    if len(event_id) <= 24:
-        return event_id
+    if not event_id or len(event_id) <= 24:
+        return event_id or ""
     return f"{event_id[:14]}…{event_id[-7:]}"
 
 

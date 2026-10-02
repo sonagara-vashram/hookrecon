@@ -85,6 +85,12 @@ class FormatAmountTest(unittest.TestCase):
     def test_currency_case_insensitive(self):
         self.assertEqual(format_amount(8900, "USD"), "$89.00")
 
+    def test_negative_amount_uses_correct_sign_math(self):
+        # -150 // 100 = -2 with Python floor division — the sign/abs branch
+        # must render -1.50, not -2.50
+        self.assertEqual(format_amount(-150, "usd"), "$-1.50")
+        self.assertEqual(format_amount(-1234, "jpy"), "¥-1234")
+
 
 class RenderReportTest(unittest.TestCase):
     def test_full_report_matches_srs_shape(self):

@@ -4,11 +4,40 @@ build-backend = "hatchling.build"
 
 [project]
 name = "hookrecon"
-version = "0.9.3"
+version = "0.9.4"
 description = "Find Stripe payments that never reached your database — read-only Stripe↔Postgres reconciliation CLI"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
+keywords = [
+    "stripe",
+    "webhook",
+    "reconciliation",
+    "postgres",
+    "payments",
+    "stripe-webhook",
+    "missing-payments",
+    "drift-detection",
+    "payment-reconciliation",
+    "webhook-debugging",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Database",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: System :: Monitoring",
+]
 dependencies = [
     "stripe>=16,<17",
     "psycopg[binary]>=3.3,<4",

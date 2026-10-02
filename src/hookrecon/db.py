@@ -8,6 +8,7 @@ import json
 import os
 import re
 import sys
+import urllib.parse
 
 import psycopg
 
@@ -50,8 +51,18 @@ def connect(url_env: str) -> psycopg.Connection:
     try:
         conn = psycopg.connect(dsn)
     except Exception as exc:
+        msg = str(exc)
+        # Scrub the password first (psycopg may cite individual DSN
+        # components rather than the full URL), then the whole DSN.
+        try:
+            parsed = urllib.parse.urlsplit(dsn)
+            if parsed.password:
+                msg = msg.replace(parsed.password, "******")
+        except Exception:
+            pass
+        msg = msg.replace(dsn, "<redacted>")
         raise DbError(
-            str(exc).replace(dsn, "<redacted>"),
+            msg,
             hint=f"if the server requires SSL, append ?sslmode=require to the {url_env} URL",
         ) from None
     # Read-only tool: one transaction per statement, so one check's SQL error
@@ -64,7 +75,7 @@ def connect(url_env: str) -> psycopg.Connection:
 def run_check(conn: psycopg.Connection, sql: str, param_value) -> list:
     """Run one already-linted check SELECT; returns all rows (0 rows = drift)."""
     translated = translate_placeholders(sql)
-    return conn.execute(translated, [param_value]).fetchall()
+    return conn.execute(translated, {"param": param_value}).fetchall()
 
 
 def make_run_sql(conn: psycopg.Connection, show_sql: bool = False):
@@ -106,7 +117,7 @@ def extract_tables(conn: psycopg.Connection, sql: str) -> list[str]:
     """
     try:
         translated = translate_placeholders(sql)
-        rows = conn.execute(f"EXPLAIN (FORMAT JSON) {translated}", [_PROBE_PARAM]).fetchall()
+        rows = conn.execute(f"EXPLAIN (FORMAT JSON) {translated}", {"param": _PROBE_PARAM}).fetchall()
         payload = rows[0][0]
         if isinstance(payload, str):
             payload = json.loads(payload)

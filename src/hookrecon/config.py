@@ -163,6 +163,12 @@ def lint_select(sql: str) -> str:
         body = body[:-1].strip()
     if ";" in body:
         raise ConfigError("SQL must be a single statement (unexpected ';')")
+    higher = sorted({int(n) for n in re.findall(r"\$(\d+)", body) if int(n) > 1})
+    if higher:
+        raise ConfigError(
+            "only $1 is supported — hookrecon binds a single value; "
+            f"found ${higher[0]}: repeat $1 instead"
+        )
     forbidden = _FORBIDDEN_RE.search(body)
     if forbidden:
         raise ConfigError(
@@ -172,12 +178,16 @@ def lint_select(sql: str) -> str:
 
 
 def translate_placeholders(sql: str) -> str:
-    """Rewrite Postgres-style $n placeholders to psycopg 3's %s.
+    """Rewrite Postgres-style $n placeholders to psycopg 3's %(param)s.
+
+    Named placeholders allow the same $1 to appear multiple times in the query
+    while binding only a single parameter value. $2+ is rejected at lint time —
+    hookrecon binds exactly one value.
 
     ponytail: naive regex can match $n inside a string literal — acceptable
     ceiling; the read-only DB user is the real boundary.
     """
-    return re.sub(r"\$\d+", "%s", sql)
+    return re.sub(r"\$\d+", "%(param)s", sql)
 
 
 def build_default_config(api_key_env: str, url_env: str, lookback_days: int) -> dict:

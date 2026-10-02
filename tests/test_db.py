@@ -107,7 +107,7 @@ class RunCheckTest(unittest.TestCase):
         conn = FakeConn(rows=[(1,)])
         rows = db.run_check(conn, "SELECT 1 FROM orders WHERE id = $1", "cs_123")
         self.assertEqual(rows, [(1,)])
-        self.assertEqual(conn.calls, [("SELECT 1 FROM orders WHERE id = %s", ["cs_123"])])
+        self.assertEqual(conn.calls, [("SELECT 1 FROM orders WHERE id = %(param)s", {"param": "cs_123"})])
 
 
 class MakeRunSqlTest(unittest.TestCase):
@@ -134,7 +134,7 @@ class ExtractTablesTest(unittest.TestCase):
         sql, params = conn.calls[0]
         self.assertTrue(sql.startswith("EXPLAIN (FORMAT JSON) "))
         self.assertNotIn("$1", sql)
-        self.assertEqual(params, ["hookrecon-doctor-probe"])
+        self.assertEqual(params, {"param": "hookrecon-doctor-probe"})
 
     def test_never_raises_falls_back_to_regex(self):
         conn = FakeConn(error=RuntimeError("no db here"))
